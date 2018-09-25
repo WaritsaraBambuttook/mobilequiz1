@@ -104,7 +104,7 @@
     <ons-page id="Tab2">
       <ons-list>
         <ons-list-header>Shopping Cart</ons-list-header>
-        <ons-list-item>
+        <!-- <ons-list-item>
           <div class="left">
             <img class="list-item__thumbnail" src="images/item1.jpg">
           </div>
@@ -117,8 +117,9 @@
               <ons-icon style="color: grey" size="30px" icon="md-delete"></ons-icon>
             </p>
           </div>
-        </ons-list-item>
-        <ons-list-item>
+        </ons-list-item> -->
+
+        <!-- <ons-list-item>
           <div class="left">
             <img class="list-item__thumbnail" src="images/item2.jpg">
           </div>
@@ -131,8 +132,9 @@
               <ons-icon style="color: grey" size="30px" icon="md-delete"></ons-icon>
             </p>
           </div>
-        </ons-list-item>
-        <ons-list-item>
+        </ons-list-item> -->
+
+        <!-- <ons-list-item>
           <div class="left">
             <img class="list-item__thumbnail" src="images/item3.jpg">
           </div>
@@ -145,7 +147,31 @@
               <ons-icon style="color: grey" size="30px" icon="md-delete"></ons-icon>
             </p>
           </div>
-        </ons-list-item>
+        </ons-list-item> -->
+        <div id="iconsCart"></div>
+
+        <script id="icon_templateCart" type="text/template">
+          <ons-row>  
+                <% cart.forEach(function(cart){%>  
+                    <ons-col>
+                           <img src="images/<%= cart.photo %>" style="text-align: center; margin: 10px;"> 
+                    </ons-col>
+                    <ons-col>
+                        
+                            <%= cart.itemname %>
+                      
+                    </ons-col>
+                    <ons-col>
+                        
+                            <%= cart.price %>
+                     
+                    </ons-col>
+
+                <%});%>
+          </ons-row>
+        </script>
+
+
       </ons-list>
       <p style="text-align: center; margin: 10px;">
         <ons-button modifier="large">PROCEED TO PAY</ons-button>
@@ -153,6 +179,7 @@
     </ons-page>
   </template>
 </body>
+
 <script>
   getHomeData();
   document.addEventListener('prechange', function (event) {
@@ -173,7 +200,16 @@
     docRef.get().then(function (doc) {
       if (doc.exists) {
         //Display data
-        console.log("Document data:", doc.data());
+        console.log("Document data Home:", doc.data());
+
+        var data = doc.data();
+        $('#appname').html(data.appname);
+        var style = "background: url('images/" + data.slides[0] + "') no-repeat center; background-size: contain;'";
+        $('#carousel1').attr('style', style)
+        var icon_template = $('#icon_template').html();
+        var html = ejs.render(icon_template, { categories: data.categories });
+        $('#icons').html(html);
+
       } else {
         // doc.data() will be undefined in this case
         console.log("No such document!");
@@ -182,7 +218,9 @@
       console.log("Error getting document:", error);
     });
 
+    
 
+    //การดึงข้อมูลจากไฟล์jsonที่เรามี ไม่ใช่จาก firebase
     // $.getJSON('home.json', function (data) {
     //   console.log(data);
     //   $('#appname').html(data.appname);
@@ -197,6 +235,30 @@
     $.getJSON('cart.json', function (data) {
       console.log(data);
     });
+
+    var docRef1 = db.collection("UI").doc("cart");
+    docRef1.get().then(function (doc) {
+      if (doc.exists) {
+        //Display data
+        console.log("Document data Cart:", doc.data());
+
+        var dataCart = doc.data();
+        //$('#itemname').html(dataCart.itemname);
+        // $('#photo').html(dataCart.photo);
+        // $('#price').html(dataCart.price);
+        var icon_templateCart = $('#icon_templateCart').html();
+        var html = ejs.render(icon_templateCart, { cart: dataCart.cart });
+        $('#iconsCart').html(html);
+
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    }).catch(function (error) {
+      console.log("Error getting document:", error);
+    });
+
+
   }
 </script>
 
