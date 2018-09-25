@@ -9,6 +9,8 @@
   <script src="ejs.js"></script>
 
   <script src="https://www.gstatic.com/firebasejs/5.5.0/firebase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-firestore.js"></script>
   <script>
     // Initialize Firebase
     var config = {
@@ -20,6 +22,14 @@
       messagingSenderId: "352502270934"
     };
     firebase.initializeApp(config);
+
+    var db = firebase.firestore();
+
+    // Disable deprecated features
+    db.settings({
+      timestampsInSnapshots: true
+    });
+
   </script>
 
   <style>
@@ -157,15 +167,31 @@
     }
   });
   function getHomeData() {
-    $.getJSON('home.json', function (data) {
-      console.log(data);
-      $('#appname').html(data.appname);
-      var style = "background: url('images/" + data.slides[0] + "') no-repeat center; background-size: contain;'";
-      $('#carousel1').attr('style', style)
-      var icon_template = $('#icon_template').html();
-      var html = ejs.render(icon_template, { categories: data.categories });
-      $('#icons').html(html);
+    //การดึหข้อมูลจากที่เราสร้างไว้ใน firebase
+    //UI,home เป็นตัวที่เราสร้างไว้ใน firebase เป็นการเข้าถึงข้อมูล
+    var docRef = db.collection("UI").doc("home");
+    docRef.get().then(function (doc) {
+      if (doc.exists) {
+        //Display data
+        console.log("Document data:", doc.data());
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    }).catch(function (error) {
+      console.log("Error getting document:", error);
     });
+
+
+    // $.getJSON('home.json', function (data) {
+    //   console.log(data);
+    //   $('#appname').html(data.appname);
+    //   var style = "background: url('images/" + data.slides[0] + "') no-repeat center; background-size: contain;'";
+    //   $('#carousel1').attr('style', style)
+    //   var icon_template = $('#icon_template').html();
+    //   var html = ejs.render(icon_template, { categories: data.categories });
+    //   $('#icons').html(html);
+    // });
   }
   function getCartData() {
     $.getJSON('cart.json', function (data) {
