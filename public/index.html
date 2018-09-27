@@ -62,6 +62,8 @@
       </ons-tab>
       <ons-tab page="tab2.html" label="Cart" icon="fa-shopping-cart" active-icon="fa-shopping-cart">
       </ons-tab>
+      <ons-tab page="tab3.html" label="Allproduct" icon="fa-shopping-cart" active-icon="fa-shopping-cart">
+      </ons-tab>
     </ons-tabbar>
   </ons-page>
 
@@ -153,29 +155,41 @@
         <script id="icon_templateCart" type="text/template">
           <ons-row>  
                 <% cart.forEach(function(cart){%>  
-                    <ons-col>
-                           <img src="images/<%= cart.photo %>" style="text-align: center; margin: 10px;"> 
-                    </ons-col>
-                    <ons-col>
-                        
-                            <%= cart.itemname %>
+                  <ons-list-item>
+                    <div class="left">
                       
-                    </ons-col>
-                    <ons-col>
-                        
-                            <%= cart.price %>
-                     
-                    </ons-col>
-
+                      <img src="<%= cart.photo %>" style="text-align: center; margin: 10px; width:70px; height:70px; padding-right:5px;">
+                    </div>
+                    <div class="center" style="padding-left:5px;">
+                      <span class="list-item__title"  ><%= cart.itemname %></span>
+                      <span class="list-item__subtitle" style="color: blue"><%= cart.price %></span>
+                    </div>
+                    <div class="right">
+                      <p style="text-align: center; margin: 10px;">
+                        <ons-icon style="color: grey" size="30px" icon="md-delete"></ons-icon>
+                      </p>
+                    </div>
+                  </ons-list-item>
                 <%});%>
           </ons-row>
         </script>
-
-
       </ons-list>
       <p style="text-align: center; margin: 10px;">
         <ons-button modifier="large">PROCEED TO PAY</ons-button>
       </p>
+    </ons-page>
+  </template>
+
+  <template id="tab3.html">
+    <ons-page id="Tab3">
+      <ons-list>
+        <ons-list-header>All Product</ons-list-header>
+      </ons-list>
+
+      <p style="text-align: center; margin: 10px;">
+        <ons-button modifier="large" onclick="addNewData();">Add New Data</ons-button>
+      </p>
+
     </ons-page>
   </template>
 </body>
@@ -191,6 +205,10 @@
       console.log('Cart clicked');
       // get data for cart screen  
       getCartData();
+    } else if (event.index == 2) {
+      console.log('All Product');
+      // get data for cart screen  
+      getAllProduct();
     }
   });
   function getHomeData() {
@@ -218,7 +236,7 @@
       console.log("Error getting document:", error);
     });
 
-    
+
 
     //การดึงข้อมูลจากไฟล์jsonที่เรามี ไม่ใช่จาก firebase
     // $.getJSON('home.json', function (data) {
@@ -259,6 +277,36 @@
     });
 
 
+  }
+
+  function getAllProduct() {
+    var Allproduct = db.collection("Products").where("category", "==", "food");
+    Allproduct.get().then(function (querySnapshot) {
+      querySnapshot.forEach(function (doc) {
+        // doc.data() is never undefined for query doc snapshots
+        console.log(doc.id, " => ", doc.data());
+      });
+    });
+  }
+
+//วิธีการเพิ่ม products 
+  function addNewData() {
+
+    var data = {
+      pid: 4,
+      title: 'IPhoneXS',
+      price: 25000,
+      category: 'SmartPhone'
+
+    }
+    //add new data ไปเลย โดยใช้ฟังชก์ัน add()
+    db.collection("Products").add(data)
+    .then(function (docRef) {
+      console.log("Document written with ID: ", docRef.id);
+    })
+      .catch(function (error) {
+        console.error("Error adding document: ", error);
+      });
   }
 </script>
 
