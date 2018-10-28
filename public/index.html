@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css">
+  <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.min.css">
+  <script src="https://unpkg.com/onsenui/js/onsenui.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+  <script src="ejs.js"></script>
+
+  <script src="https://www.gstatic.com/firebasejs/5.5.0/firebase.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/5.4.1/firebase-firestore.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyC3g2Wsw91T9pfZ9E2SjG1Lq4v7U9SwjLo",
+      authDomain: "shopee-45110.firebaseapp.com",
+      databaseURL: "https://shopee-45110.firebaseio.com",
+      projectId: "shopee-45110",
+      storageBucket: "shopee-45110.appspot.com",
+      messagingSenderId: "352502270934"
+    };
+    firebase.initializeApp(config);
+    var db = firebase.firestore();
+    // Disable deprecated features
+    db.settings({
+      timestampsInSnapshots: true
+    });
+
+  </script>
+
+  <style>
+    .toolbaricon {
+      padding-left: 5px;
+      padding-bottom: 5px;
+      padding-right: 5px;
+      color: orange;
+    }
+  </style>
+</head>
+
+
+<body>
+  <ons-page>
+    <ons-toolbar>
+      <div class="left">
+        <ons-icon class="toolbaricon" size="30px" icon="fa-shopping-bag">
+        </ons-icon>
+      </div>
+      <div class="center" id="appname">#</div>
+      <div class="right">
+        <ons-icon class="toolbaricon" size="30px" icon="md-help">
+        </ons-icon>
+      </div>
+    </ons-toolbar>
+
+    <ons-tabbar swipeable position="auto">
+      <ons-tab page="home.html" label="Home" icon="ion-home, material:md-home" badge="7" active></ons-tab>
+      <ons-tab page="cart.html" label="Cart" icon="fa-shopping-cart" active-icon="fa-shopping-cart"></ons-tab>
+    </ons-tabbar>
+  </ons-page>
+
+  <template id="home.html">
+    <ons-page id="home">
+      <p style="text-align: center; margin-top: 10px;">
+        <ons-search-input placeholder="Search" id="search"></ons-search-input>
+      </p>
+      <ons-carousel swipeable auto-scroll overscrollable id="carousel" style="height: 300px;">
+        <ons-carousel-item id="carousel1" style="background: url('images/1.jpg') no-repeat center; background-size: contain;">
+        </ons-carousel-item>
+        <ons-carousel-item id="carousel2" style="background: url('images/2.jpg') no-repeat center; background-size: contain;">
+        </ons-carousel-item>
+        <ons-carousel-item id="carousel3" style="background: url('images/3.jpg') no-repeat center; background-size: contain;">
+        </ons-carousel-item>
+      </ons-carousel>
+<br> <br>
+      <div id="icons" style="padding-top: 5px;"></div>
+
+      <script id="icon_template" type="text/template">
+        <ons-row style="height:120px;" vertical-align="center">  
+              <% categories.forEach(function(category){%>  
+                  <ons-col id="searchCategories" style="background:#ffff66;" width="50%">
+                      <p style="text-align: center; margin: 10px;" id="icon1_text">
+                          <img src="<%= category.photo %>" style="text-align: center;  width:120px; height:120px; ">
+                      </p>
+                      <p style="text-align: center; margin: 10px;" id="icon1_text">
+                          <%= category.name %>
+                      </p>
+                      <p style="text-align: center; margin: 10px;" id="icon1_text">
+                        <%= category.price %>
+                    </p>
+                  </ons-col>
+              <%});%>
+        </ons-row>
+      </script>
+    </ons-page>
+  </template>
+
+  <template id="cart.html">
+    <ons-page id="cart">
+      <ons-list>
+        <ons-list-header>Shopping Cart</ons-list-header>
+        <div id="iconsCart"></div>
+        <script id="icon_templateCart" type="text/template">
+          <ons-row>  
+                <% cart.forEach(function(cart){%>  
+                  <ons-list-item>
+                    <div class="left">
+                      <img src="<%= cart.photo %>" style="text-align: center; margin: 10px; width:70px; height:70px; padding-right:5px;">
+                    </div>
+                    <div class="center" style="padding-left:5px;">
+                      <span class="list-item__title"  ><%= cart.itemname %></span>
+                      <span class="list-item__subtitle" style="color: blue"><%= cart.price %></span>
+                    </div>
+                    <div class="right">
+                      <p style="text-align: center; margin: 10px;">
+                        <ons-icon style="color: grey" size="30px" icon="md-delete"></ons-icon>
+                      </p>
+                    </div>
+                  </ons-list-item>
+                <%});%>
+          </ons-row>
+        </script>
+      </ons-list>
+      <p style="text-align: center; margin: 10px;">
+        <ons-button modifier="large">PROCEED TO PAY</ons-button>
+      </p>
+    </ons-page>
+  </template>
+
+</body>
+
+<script>
+  getHomeData();
+  document.addEventListener('prechange', function (event) {
+    if (event.index == 0) {
+      console.log('Home clicked');
+      // get data for home screen  
+      getHomeData();
+    } else {
+      console.log('Cart clicked');
+      // get data for cart screen  
+      getCartData();
+    } 
+  });
+  function getHomeData() {
+    //การดึงข้อมูลจากที่เราสร้างไว้ใน firebase
+    //UI,home เป็นตัวที่เราสร้างไว้ใน firebase เป็นการเข้าถึงข้อมูล
+    var docRef = db.collection("UI").doc("home");
+    docRef.get().then(function (doc) {
+      if (doc.exists) {
+        //Display data
+        console.log("Document data Home:", doc.data());
+
+        var data = doc.data();
+        $('#appname').html(data.appname);
+        var style = "background: url('images/" + data.slides[0] + "') no-repeat center; background-size: contain;'";
+        $('#carousel1').attr('style', style)
+        var icon_template = $('#icon_template').html();
+        var html = ejs.render(icon_template, { categories: data.categories });
+        $('#icons').html(html);
+
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    }).catch(function (error) {
+      console.log("Error getting document:", error);
+    });
+
+    $(document).ready(function(){
+        $('#search').on('keyup',function(){
+          var search = $(this).val().toLowerCase();
+            console.log(search);
+          $('#icons ons-row ons-col').each(function(){
+            var line =$(this).text().toLocaleLowerCase()
+            console.log(line)
+            if (line.indexOf(search)=== -1){
+              $(this).hide();
+            }else{
+              $(this).show();
+            }
+          })
+        })
+    });
+    //การดึงข้อมูลจากไฟล์jsonที่เรามี ไม่ใช่จาก firebase
+    // $.getJSON('home.json', function (data) {
+    //   console.log(data);
+    //   $('#appname').html(data.appname);
+    //   var style = "background: url('images/" + data.slides[0] + "') no-repeat center; background-size: contain;'";
+    //   $('#carousel1').attr('style', style)
+    //   var icon_template = $('#icon_template').html();
+    //   var html = ejs.render(icon_template, { categories: data.categories });
+    //   $('#icons').html(html);
+    // });
+  }
+  function getCartData() {
+    $.getJSON('cart.json', function (data) {
+      console.log(data);
+    });
+
+    var docRef1 = db.collection("UI").doc("cart");
+    docRef1.get().then(function (doc) {
+      if (doc.exists) {
+        //Display data
+        console.log("Document data Cart:", doc.data());
+
+        var dataCart = doc.data();
+        //$('#itemname').html(dataCart.itemname);
+        // $('#photo').html(dataCart.photo);
+        // $('#price').html(dataCart.price);
+        var icon_templateCart = $('#icon_templateCart').html();
+        var html = ejs.render(icon_templateCart, { cart: dataCart.cart });
+        $('#iconsCart').html(html);
+
+      } else {
+        // doc.data() will be undefined in this case
+        console.log("No such document!");
+      }
+    }).catch(function (error) {
+      console.log("Error getting document:", error);
+    });
+
+
+  }
+
+  function getAllProduct() {
+    var Allproduct = db.collection("Products").where("category", "==", "food");
+    Allproduct.get().then(function (querySnapshot) {
+      querySnapshot.forEach(function (doc) {
+        // doc.data() is never undefined for query doc snapshots
+        console.log(doc.id, " => ", doc.data());
+      });
+    });
+  }
+
+  //วิธีการเพิ่ม products 
+  function addNewData() {
+
+    var data = {
+      pid: 4,
+      title: 'IPhoneXS',
+      price: 25000,
+      category: 'SmartPhone'
+
+    }
+    //add new data ไปเลย โดยใช้ฟังชก์ัน add()
+    db.collection("Products").add(data)
+      .then(function (docRef) {
+        console.log("Document written with ID: ", docRef.id);
+      })
+      .catch(function (error) {
+        console.error("Error adding document: ", error);
+      });
+  }
+</script>
+
+</html>
