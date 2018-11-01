@@ -10,6 +10,8 @@ document.addEventListener('init', function (event) {
     } else if (page.id == 'detail') {
         var data = page.data.data;
         GetData.getdetailProduct(data.name, data.cat);
+    } else if (page.id == 'cart') {
+        GetData.getCart()
     }
 });
 

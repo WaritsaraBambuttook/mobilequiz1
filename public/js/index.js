@@ -27,7 +27,7 @@ function setTabHighlight(tabNo) {
     }
 }
 
-function gotodetailProdcut(name, cat){
+function gotodetailProdcut(name, cat) {
     var data = {
         name: name,
         cat: cat
@@ -38,4 +38,31 @@ function gotodetailProdcut(name, cat){
             data: data
         }
     })
+}
+
+
+function addtocart(data) {
+    var cart = JSON.parse(localStorage.getItem('cart'))
+    if (cart == null) {
+        cart = []
+    }
+    var product = JSON.stringify(data[0])
+    cart.push(product)
+    localStorage.setItem('cart', JSON.stringify(cart));
+    ons.notification.toast('Added item to cart!!', { timeout: 1000 });
+}
+
+function removeCartProduct(index) {
+    var cart = JSON.parse(localStorage.getItem('cart'))
+    if (cart == null) {
+        cart = []
+    }
+    if (cart.length < 1) {
+        console.log(index)
+    } else {
+        cart.splice(index, 1)
+        console.log(cart)
+        localStorage.setItem('cart', JSON.stringify(cart));
+        GetData.getCart()
+    }
 }

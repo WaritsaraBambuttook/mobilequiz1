@@ -50,7 +50,7 @@ var GetData = {
         docRef.get().then(function (doc) {
             if (doc.exists) {
                 var data = doc.data();
-                data.goods.forEach(function(data){
+                data.goods.forEach(function (data) {
                     data.cat = doc.id
                 })
                 var icon_template = $('#products_template').html();
@@ -65,15 +65,15 @@ var GetData = {
             console.log("Error getting document:", error);
         });
     },
-    getdetailProduct: function (name,cat) {
-        console.log(name , cat)
+    getdetailProduct: function (name, cat) {
+        console.log(name, cat)
         var modal = document.querySelector('ons-modal');
         modal.show();
         var docRef = db.collection("products").doc(cat)
         var produc = null;
-        docRef.get().then(function(doc){
+        docRef.get().then(function (doc) {
             var data = doc.data()
-            product = data.goods.filter(function(data){
+            product = data.goods.filter(function (data) {
                 return data.name == name
             })
             var icon_template = $('#Detailproducts_template').html();
@@ -104,4 +104,30 @@ var GetData = {
             console.log("Error getting document:", error);
         });
     },
+    getCart: function () {
+        var modal = document.querySelector('ons-modal');
+        modal.show();
+        var cart = JSON.parse(localStorage.getItem('cart'))
+        if (cart == null) {
+            cart = []
+        }
+        if (cart.length < 1) {
+            var cart_template = $('#cart_template').html();
+            var html = ejs.render(cart_template, { cart: cart });
+            $('#cartProducts').html(html);
+            setTimeout(() => {
+                modal.hide()
+            }, 800);
+        } else {
+            var data = cart.map(function(product){
+                return JSON.parse(product)
+            })
+            var cart_template = $('#cart_template').html();
+            var html = ejs.render(cart_template, { cart: data });
+            $('#cartProducts').html(html);
+            setTimeout(() => {
+                modal.hide()
+            }, 800);
+        }
+    }
 }
